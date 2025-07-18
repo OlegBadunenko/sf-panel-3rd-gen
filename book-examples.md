@@ -1,4 +1,4 @@
-# xtsf3gIllustration and Replication
+# xtsf3g Illustration and Replication
 
 In this article, the functionalityIn this article, the functionality of the commands **xtsf3gpss1**,
 **xtsf3gpss2**, **xtsf3gpss3**, and **xtsf3gkss** are showcased. The
