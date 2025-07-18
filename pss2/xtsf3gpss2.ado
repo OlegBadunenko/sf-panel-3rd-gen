@@ -10,6 +10,7 @@
 *! version 1.5.2  16Apr2020
 *! version 1.5.3  12Aug2020
 *! version 1.6.0  31Aug2020
+*! version 1.6.1  18Jul2025
 
 /*
 Origin:
@@ -27,9 +28,9 @@ oleg.badunenko@brunel.ac.uk, obadunenko@gmail.com
 */
 
 
-// if(c(MP)){
-// 	set processors 1
-// }
+if(c(MP)){
+	set processors 1
+}
 
 
 capture program drop xtsf3gpss2
@@ -61,7 +62,8 @@ version 11
 	         PSS2W EPSS2W EPSS2W_p PSS2G EPSS2G EPSS2G_p                     ///
 			 alphaW alphaW_p alphaG alphaG_p                                 ///
 			 bwW bwG sgrid aicW bicW aicG bicG rezW rezG mytrace             ///
-			 b2 V12 V2 fittedW fittedG shatW RSSW CpW shatG RSSG CpG mypanelvar
+			 b2 V12 V2 fittedW fittedG shatW RSSW CpW shatG RSSG CpG mypanelvar ///
+			 Ti
 			 
 	if "`dots'" == "nodots" {
 		local mytrace 0
@@ -88,10 +90,29 @@ version 11
 	
 	display
   display as result "Description of the panel data:" as input "{hline 48}
+	  quietly xtset
+  local mypanelvar `r(panelvar)'
+  local mytimevar `r(timevar)'
 	xtdescribe if `touse'
+// 	di 11
+	if r(min) <= 2 {
+		display
+		display as error "IDs with 2 or fewer observations have been excluded from estimation"
+		display
+		// 		generate sample = `touse'
+		quietly bysort `mypanelvar' (`touse'): egen `Ti' = count(`mypanelvar') if `touse'
+
+		* Exclude IDs with 2 or fewer observations
+		quietly replace `touse' = 0 if `Ti' <= 2
+
+// 		* Optional: display a message
+		xtdescribe if `touse'
+	}
+// 	di 12
   quietly xtset
   local mypanelvar `r(panelvar)'
   local mytimevar `r(timevar)'
+	
   
   // handle production/cost function
 	if "`cost'" == "" { 
@@ -228,7 +249,7 @@ version 11
 
 end
 
-
+**# pss2_work
 
 mata mata clear
 
@@ -291,6 +312,8 @@ void pss2_work( string scalar depvar,                                        ///
 	ids1b     = ids[,1], ids[,2] :- 1, ids[,3] :- 1
 	ids2a     = ids[,1] :+ 2, ids[,2], ids[,3] :- 2
 	ids2b     = ids[,1], ids[,2] :- 2, ids[,3] :- 2
+	
+	
 	
 	//204
 	
@@ -455,6 +478,8 @@ void pss2_work( string scalar depvar,                                        ///
 }
 end
 
+**# pss2onlyB
+
 mata 
 //mata clear
 //mata drop pss2onlyB()
@@ -484,7 +509,9 @@ void pss2onlyB( real vector y,     real matrix x,                     ///
 	xbar      = J(n, p, .)	
 	ybar_p    = J(nt, 1, .)
 	xbar_p    = J(nt, p, .)
+// 	11
 	for (i=1; i<=n; i++) {
+// 		i
 		x_p_work = panelsubmatrix(x, i, ids)
 		y_p_work = panelsubmatrix(y, i, ids)
 		ybar[i,.] = mean(y_p_work)
@@ -492,6 +519,7 @@ void pss2onlyB( real vector y,     real matrix x,                     ///
 		ybar_p[ids[i,1]::ids[i,2],.] = J(ids[i,3], 1, ybar[i,.])
 		xbar_p[ids[i,1]::ids[i,2],.] = J(ids[i,3], 1, xbar[i,.])
 	}
+// 	12
 	
 	ytilde    = y - ybar_p
 	xtilde    = x - xbar_p
@@ -509,7 +537,21 @@ void pss2onlyB( real vector y,     real matrix x,                     ///
 	C_i0      = J(n, 1, .)
 	C_i1      = J(n, 1, .)
 	C_i2      = J(n, 1, .)
+// 	21
+// 	"ids1a"
+// 	ids1a, ids1b, ids2a, ids2b
 	for (i=1; i<=n; i++) {
+// 		i
+// 		panelsubmatrix(restilde, i, ids)
+// 		ids[i,3]
+// 		panelsubmatrix(restilde, i, ids1a)
+// 		ids1a[i,3]
+// 		panelsubmatrix(restilde, i, ids1b)
+// 		ids1b[i,3]
+// 		panelsubmatrix(restilde, i, ids2a)
+// 		ids2a[i,3]
+// 		panelsubmatrix(restilde, i, ids2b)
+// 		ids2a[i,3]
 		C_i0[i] = cross(panelsubmatrix(restilde, i, ids),
 		                panelsubmatrix(restilde, i, ids)) / ids[i,3]
 		C_i1[i] = cross(panelsubmatrix(restilde, i, ids1a),
@@ -517,6 +559,7 @@ void pss2onlyB( real vector y,     real matrix x,                     ///
 		C_i2[i] = cross(panelsubmatrix(restilde, i, ids2a),
 		                panelsubmatrix(restilde, i, ids2b)) / ids2a[i,3]
 	}
+// 	22
 	rtilde    = sum(C_i1-C_i2) / sum(C_i0-C_i1)
 	// this could be outside [-1,1]l then need to deal with complex numbers
 	rtilde_g_1= rtilde > 1 | rtilde < -1
