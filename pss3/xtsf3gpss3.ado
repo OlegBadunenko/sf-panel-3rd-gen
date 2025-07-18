@@ -7,6 +7,7 @@
 *! version 1.3.3  16Apr2020
 *! version 1.3.4  12Aug2020
 *! version 1.4.0  31Aug2020
+*! version 1.4.1  18Jul2025
 
 /*
 Origin:
@@ -56,7 +57,8 @@ version 11
 	local indepvars `r(varlist)'
 	
 	tempname b V n1 nt1 R2 R2adj Epss3 Epss3_p alpha alpha_p bw_opt sgrid    ///
-			 aic bic rez mytrace fitted shat1 RSS1 Cp1 mypanelvar
+			 aic bic rez mytrace fitted shat1 RSS1 Cp1 mypanelvar ///
+			 Ti
 			 
 	if "`dots'" == "nodots" {
 		local mytrace 0
@@ -76,10 +78,29 @@ version 11
 	}
 	
 	display
-	display as result "Description of the panel data:" as input "{hline 48}
-  xtdescribe if `touse'
+  display as result "Description of the panel data:" as input "{hline 48}
+	  quietly xtset
+  local mypanelvar `r(panelvar)'
+  local mytimevar `r(timevar)'
+	xtdescribe if `touse'
+// 	di 11
+	if r(min) <= 4 {
+		display
+		display as error "IDs with 4 or fewer observations have been excluded from estimation"
+		display
+		// 		generate sample = `touse'
+		quietly bysort `mypanelvar' (`touse'): egen `Ti' = count(`mypanelvar') if `touse'
+
+		* Exclude IDs with 2 or fewer observations
+		quietly replace `touse' = 0 if `Ti' <= 4
+
+// 		* Optional: display a message
+		xtdescribe if `touse'
+	}
+// 	di 12
   quietly xtset
   local mypanelvar `r(panelvar)'
+  local mytimevar `r(timevar)'
   
   // handle production/cost function
 	if "`cost'" == "" { 
@@ -237,6 +258,8 @@ void pss3_robyty( string scalar depvar,                                        /
 	ids4a1b3    = ids[,1] :+ 1, ids[,2] :- 3, ids[,3] :- 4
 	// skip first 0 and last 3
 	ids4a0b4    = ids[,1] :+ 0, ids[,2] :- 4, ids[,3] :- 4
+	
+// 	ids4a0b4
 	
 	//204
 	
