@@ -1,0 +1,30 @@
+title: StataSFpanel3gen
+
+template:
+  params:
+    bootswatch: spacelab
+
+authors:
+  Oleg Badunenko:
+    href: https://OlegBadunenko.github.io/
+
+navbar:
+  title: "xtsf3g"
+  left:
+    - text: "User Guide"
+      href: book-examples.html
+    - text: "News/Changelog"
+      href: news/index.html
+
+articles:
+  - title: User Guide
+    desc: >
+      The article guides through the code to replicate the results presented
+      in the chapter.
+    contents:
+    - book-examples
+
+home:
+  links:
+    - text: Source Code
+      href: https://github.com/OlegBadunenko/sf-panel-3rd-gen

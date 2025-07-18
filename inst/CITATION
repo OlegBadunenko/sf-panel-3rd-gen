@@ -1,0 +1,10 @@
+note <- sprintf("Stata package version %s", meta$Version)
+
+bibentry(
+  bibtype  = "Misc",
+  title    = "StataSFpanel3gen: Stata commands to estimate the panel data stochastic frontier models of the third generation",
+         author = c(person("Oleg","Badunenko")),
+  year     = "2025",
+  url      = "https://github.com/OlegBadunenko/sf-panel-3rd-gen",
+  header   = "To cite the Stata package StataSFpanel3gen:\n"
+)
