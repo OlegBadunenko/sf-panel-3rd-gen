@@ -28,9 +28,9 @@ oleg.badunenko@brunel.ac.uk, obadunenko@gmail.com
 */
 
 
-if(c(MP)){
-	set processors 1
-}
+// if(c(MP)){
+// 	set processors 1
+// }
 
 
 capture program drop xtsf3gpss2
