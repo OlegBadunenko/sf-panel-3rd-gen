@@ -126,7 +126,7 @@ version 11
 	matrix colnames `Ekss'   = "Efficiency"
 	ereturn post `b' `V', esample(`touse') buildfvinfo depname("`depvar'")
 	ereturn scalar N           = `n1'
-	ereturn scalar NT          = `nt1'
+	ereturn scalar sumTi          = `nt1'
 	ereturn scalar L          = `lstar'
 	ereturn scalar r2         = `R2'
 	ereturn scalar r2_a       = `R2adj'
