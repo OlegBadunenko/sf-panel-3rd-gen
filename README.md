@@ -39,7 +39,7 @@ github install OlegBadunenko/sf-panel-3rd-gen
 The package can be installed without the *github* command:
 
 ```stata
-net install xtsf1g2g, from("https://raw.githubusercontent.com/OlegBadunenko/sf-panel-3td-gen/main")
+net install xtsf3g, from("https://raw.githubusercontent.com/OlegBadunenko/sf-panel-3td-gen/main")
 ```
 
 # Help
